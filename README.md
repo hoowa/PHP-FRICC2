@@ -20,9 +20,15 @@ FRICC2
    2. ZLIB Support in PHP
       PHP must be compiled with the "--with-zlib" option.
       Check that PHP has zlib compiled in it with the PHP script:
-      "<? gzopen(); ?>"
+      
+      ```php
+      <?php
+          gzopen();
+      ?>
+      ```
+      
       If PHP knows about the function you can happily proceed.
-
+      
    3. UNIX like OS (LINUX, FreeBSD, etc. are included) .
 
       
