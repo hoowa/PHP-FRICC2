@@ -1,7 +1,0 @@
-FRICCLOAD2_SHARED_LIBADD = libfriccload2ext.so
-LTLIBRARY_NAME		= libfriccload2.la
-LTLIBRARY_SOURCES	= friccload2.c
-LTLIBRARY_SHARED_NAME	= friccload2.la
-LTLIBRARY_SHARED_LIBADD	= $(FRICCLOAD2_SHARED_LIBADD)
-
-include $(top_srcdir)/build/dynlib.mk
