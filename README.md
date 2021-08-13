@@ -7,7 +7,17 @@ FRICC2
 
    
    
-2. Requirement
+2. Features
+
+   1. Less file handle open or read.
+   2. Compress supported, small size of target files.
+   3. Fix serval memory Leak.
+   4. More performance when php open files.
+   5. Supported Bundle in PHP with static.
+   6. Tested on Ubuntu / Openwrt.
+   7. Tested in x86_64 / MIPS / ARM Processors.
+   
+3. Requirement
 
    1. PHP Version
       
@@ -33,7 +43,7 @@ FRICC2
 
       
 
-3. Installation
+4. Installation
 
    Get Source
 
@@ -96,7 +106,7 @@ FRICC2
 
    
 
-4. How To Use
+5. How To Use
 
    ```bash
    # Create test.php
@@ -115,6 +125,6 @@ FRICC2
 
    
 
-5. Copyright
+6. Copyright
    Sun Bing <hoowa.sun@gmail.com>
 
