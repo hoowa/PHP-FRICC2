@@ -48,25 +48,25 @@ FRICC2
    Install Build Tools
 
    ```
-   # Example CentOS
+   # Example CentOS 7.9
    yum groupinstall "Development Tools"
    yum install zlib-static zlib-devel
    
    # Example Ubuntu
-   sudo apt install build-essential pkg-config autoconf
+   sudo apt install build-essential pkg-config autoconf zlib1g-dev
    ```
 
    Get Source
 
    ```bash
+   cd ~/
    git clone https://github.com/hoowa/FRICC2.git
-   cd FRICC2
    ```
 
    Change KEY / TAG (Recommend)
 
    ```bash
-   # Edit fricc2load/fricc2_lib.h
+   # Edit FRICC2/fricc2load/fricc2_lib.h
    
    # Change TAG with your own string(example):
    #define FRICCTAG_STR    "HOOWA"
@@ -79,7 +79,7 @@ FRICC2
    Build Encoder Program
 
    ```bash
-   cd fricc2/
+   cd ~/FRICC2/fricc2/
    make
    cp fricc2 /usr/bin/
    # Syntax to encrypt php script code
@@ -89,7 +89,7 @@ FRICC2
    Build PHP Extension fricc2load (Optional Shared)
 
    ```bash
-   cd friccload2/
+   cd ~/FRICC2/fricc2load/
    phpize
    ./configure
    make
@@ -99,20 +99,23 @@ FRICC2
    # Restart the web server / your php daemon
    # Test in CLI
    php -m|grep fricc2load
+   cd ..
    ```
 
    Build PHP Extension fricc2load (Optional Bundled in PHP)
 
    ```bash
    # example of your php source in ~/php-7.4.22/
-   cp -avf friccload2/ ~/php-7.4.22/ext
    cd ~/php-7.4.22
-   buildconf --force
-   # append --enable-fricc2load=static --with-zlib to configure
-   # example ./configure --enable-fricc2load=static --with-zlib
-   # normal make and make install
+   cp -avf ~/FRICC2/fricc2load/ ./ext/
+   ./buildconf --force
+   # append --enable-fricc2load=static --with-zlib to configure (example):
+   ./configure --enable-fricc2load=static --with-zlib
+   make
+   make install
    # check modules
    php -m|grep fricc2load
+   cd ..
    ```
 
    
