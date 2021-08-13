@@ -61,8 +61,8 @@ FRICC2
    #define FRICCTAG_STR    "HOOWA"
    #define FRICCTAG_LEN    5
    
-   # Change New KEY(example):
-   #define FRICCKEY 1,2,3,4,5,6,7,8
+   # Change New KEY(KEYs must more than 16, example):
+   #define FRICCKEY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
    ```
 
    Build Encoder Program
