@@ -1,6 +1,9 @@
 all: fricc2
 
 fricc2: fricc2.c
+	gcc -Wall -O2 -o fricc2 fricc2.c ../fricc2load/fricc2_lib.c -I../fricc2load/ -lz
+
+static:
 	gcc -Wall -O2 -o fricc2 fricc2.c ../fricc2load/fricc2_lib.c -I../fricc2load/ -lz -static
 
 debug:

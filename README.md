@@ -45,6 +45,17 @@ FRICC2
 
 4. Installation
 
+   Install Build Tools
+
+   ```
+   # Example CentOS
+   yum groupinstall "Development Tools"
+   yum install zlib-static zlib-devel
+   
+   # Example Ubuntu
+   sudo apt install build-essential pkg-config autoconf
+   ```
+
    Get Source
 
    ```bash
