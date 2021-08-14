@@ -1,14 +1,12 @@
 # What's FRICC2?
 
----
-
 FRICC2 is a PHP Script encryption tool. When you are developing a commercial software using PHP, the script can be distributed as encrypted up until just before execution. Thanks for PHP-Screw.
 
 
 
-## Features
 
----
+
+## Features
 
 1. Less file handle open or read.
 2. Compress supported, small size of target files.
@@ -20,9 +18,9 @@ FRICC2 is a PHP Script encryption tool. When you are developing a commercial sof
 
 
 
-## Requirement
 
-----
+
+## Requirement
 
 ### PHP Version
 
@@ -39,9 +37,9 @@ PHP must be compiled with the "--with-zlib" option.
 
 
 
-## Installation
 
-----
+
+## Installation
 
 ### Get Source
 
@@ -102,8 +100,6 @@ hello fricc2
 
 
 ## Others
-
----
 
 ### Optional Build PHP Extension (Static)
 
