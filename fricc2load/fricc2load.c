@@ -22,6 +22,15 @@
 	ZEND_PARSE_PARAMETERS_END()
 #endif
 
+/* For compatibility with PHP 8.X versions */
+#ifndef TSRMLS_D
+#define TSRMLS_D void
+#define TSRMLS_DC
+#define TSRMLS_C
+#define TSRMLS_CC
+#define TSRMLS_FETCH()
+#endif
+
 /*
 	=======================================================================
 	FRICC2LOAD Functions
