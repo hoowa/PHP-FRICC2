@@ -1,0 +1,88 @@
+#!/usr/bin/perl
+use FindBin qw($Bin);
+use Data::Dumper;
+use Time::HiRes qw(gettimeofday);
+use List::Util qw(shuffle);
+use strict;
+
+my ($seconds, $microseconds) = gettimeofday;
+my $sm = $seconds+$microseconds;
+srand($sm);
+
+# ============================================
+# generate key string and save to fricc2_lib.h
+# ============================================
+my $key_str = '';
+my $key_limit = 32767; #-32768~+32767
+for (my $i=0;$i<16;$i++) {
+	$key_str .= int(rand($key_limit)).',';
+}
+chop($key_str);
+
+print "New Key is: $key_str\n";
+my @source_body;
+open(DATA, "<$Bin/fricc2_lib.h") or die "Error To Read file!\n";
+@source_body = <DATA>;
+close(DATA);
+
+open(DATA, ">$Bin/fricc2_lib.h") or die "Error To Write file!\n";
+foreach my $line (@source_body) {
+	if ($line =~ /^#define FRICCKEY /) {
+		print DATA '#define FRICCKEY '.$key_str."\n";
+	} else {
+		print DATA $line;
+	}
+}
+close(DATA);
+
+# ============================================
+# generate key order and save to fricc2_lib.c
+# ============================================
+my (%keys_used, %keys_selected);
+my $keys_count=0;
+my $keys_buf='';
+while(1)
+{
+	my $key1 = int(rand(15));
+	my $key2 = int(rand(15));	
+	if (exists $keys_used{$key1} || exists $keys_used{$key2} || $key1 == $key2) {
+		next;
+	}
+	$keys_used{$key1} = 1;
+	$keys_used{$key2} = 1;
+
+	$keys_selected{$key1} = $key2;
+	$keys_count++;
+	if ($keys_count >= 4) {
+		last;
+	}
+}
+foreach my $old_idx (keys %keys_selected)
+{
+ 	$keys_buf .= "\ti = friccload_key[".$old_idx."];\n".
+ 				"\tfriccload_key[".$old_idx."] = friccload_key[".$keys_selected{$old_idx}."];\n".
+				"\t".'friccload_key['.$keys_selected{$old_idx}."] = i;\n";
+}
+print "New Key order: ";
+print Dumper \%keys_selected;
+my @source_body;
+open(DATA, "<$Bin/fricc2_lib.c") or die "Error To Read file!\n";
+@source_body = <DATA>;
+close(DATA);
+open(DATA, ">$Bin/fricc2_lib.c") or die "Error To Write file!\n";
+my $start_pos = 0;
+foreach my $line (@source_body) {
+	if ($line =~ /\/\/ start_rre/) {
+ 		print DATA $line;
+ 		$start_pos = 1;
+ 	} elsif ($line =~ /\/\/ end_rre/) {
+ 		print DATA $keys_buf;
+ 		print DATA $line;
+ 		$start_pos = 0;
+ 	} elsif ($start_pos == 1) {
+ 		next;
+ 	} else {
+ 		print DATA $line;
+ 	}
+}
+close(DATA);
