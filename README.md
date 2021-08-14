@@ -15,6 +15,7 @@ FRICC2 is a PHP Script encryption tool. When you are developing a commercial sof
 5. Supported Bundle in PHP with static.
 6. Tested on Ubuntu / CentOS / Openwrt.
 7. Tested in x86_64 / MIPS / ARM Processors.
+8. Supported PHP 8(include JIT), Tested Memory Leak.
 
 
 
