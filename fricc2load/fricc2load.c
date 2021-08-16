@@ -140,7 +140,7 @@ ZEND_API zend_op_array *fricc2load_compile_file(zend_file_handle *file_handle, i
 */
 PHP_MINIT_FUNCTION(fricc2load)
 {
-	CG(compiler_options) |= ZEND_COMPILE_EXTENDED_INFO;
+//	CG(compiler_options) |= ZEND_COMPILE_EXTENDED_INFO;
 	org_compile_file = zend_compile_file;
 	zend_compile_file = fricc2load_compile_file;
 	return SUCCESS;
@@ -148,7 +148,7 @@ PHP_MINIT_FUNCTION(fricc2load)
 
 PHP_MSHUTDOWN_FUNCTION(fricc2load)
 {
-	CG(compiler_options) |= ZEND_COMPILE_EXTENDED_INFO;
+//	CG(compiler_options) |= ZEND_COMPILE_EXTENDED_INFO;
 	zend_compile_file = org_compile_file;
 	return SUCCESS;
 }

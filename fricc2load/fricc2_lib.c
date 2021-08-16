@@ -24,12 +24,18 @@ void fricc2_lib_decrypt(char *file_buf, size_t *file_buf_len)
 	int cryptokey_len = sizeof friccload_key / 2;
 
 	// start_rre
-	i = friccload_key[3];
-	friccload_key[3] = friccload_key[14];
-	friccload_key[14] = i;
+	i = friccload_key[13];
+	friccload_key[13] = friccload_key[12];
+	friccload_key[12] = i;
+	i = friccload_key[9];
+	friccload_key[9] = friccload_key[6];
+	friccload_key[6] = i;
 	i = friccload_key[7];
-	friccload_key[7] = friccload_key[9];
-	friccload_key[9] = i;
+	friccload_key[7] = friccload_key[8];
+	friccload_key[8] = i;
+	i = friccload_key[1];
+	friccload_key[1] = friccload_key[11];
+	friccload_key[11] = i;
 	// end_rre
 
    	for (i=0; i<*file_buf_len; i++)
