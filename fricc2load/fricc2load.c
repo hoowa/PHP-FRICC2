@@ -110,8 +110,16 @@ ZEND_API zend_op_array *fricc2load_compile_file(zend_file_handle *file_handle, i
 	// decode real data
 	real_data_buf = fricc2load_fd_decrypt(fp, &real_data_len);
 	fclose(fp);
-	if (real_data_buf == NULL)
-	 	return NULL;
+	if (real_data_buf == NULL) {
+		//real_data_len = 0;
+		return org_compile_file(file_handle, type TSRMLS_CC);
+	} else if (real_data_len == 0) {
+		if (real_data_buf != NULL) {
+			efree(real_data_buf);
+			real_data_buf = NULL;
+		}
+		return org_compile_file(file_handle, type TSRMLS_CC);
+	}
 
 	// replace with new buf
   	if ( zend_stream_fixup(file_handle, &tmp_buf, &tmp_size TSRMLS_CC) == FAILURE )
