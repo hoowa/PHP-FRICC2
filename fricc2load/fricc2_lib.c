@@ -38,8 +38,8 @@ void fricc2_lib_decrypt(char *file_buf, size_t *file_buf_len)
 	friccload_key[11] = i;
 	// end_rre
 
-   	for (i=0; i<*file_buf_len; i++)
-	 	file_buf[i] = (char)friccload_key[(*file_buf_len - i) % cryptokey_len] ^ (~(file_buf[i]));
+	for (i=0; i<*file_buf_len; i++)
+		file_buf[i] = (char)friccload_key[(*file_buf_len - i) % cryptokey_len] ^ (~(file_buf[i]));
 
 	return;
 }
@@ -50,75 +50,75 @@ char *fricc2_lib_zcodecom(int mode, char *inbuf, size_t inbuf_len, size_t *resul
 	char outbuf[OUTBUFSIZ];
 
 	int count, status;
-	char *resultbuf;
+	char *resultbuf = NULL;
 	size_t total_count = 0;
 	
 	z.zalloc = Z_NULL;
- 	z.zfree = Z_NULL;
- 	z.opaque = Z_NULL;
+	z.zfree = Z_NULL;
+	z.opaque = Z_NULL;
 
 	z.next_in = Z_NULL;
 	z.avail_in = 0;
- 	if (mode == 0) {
- 		deflateInit(&z, 1);
- 	} else {
- 		inflateInit(&z);
- 	}
+	if (mode == 0) {
+		deflateInit(&z, 1);
+	} else {
+		inflateInit(&z);
+	}
 
- 	z.next_out = (Bytef *)outbuf;
- 	z.avail_out = OUTBUFSIZ;
- 	z.next_in = (Bytef *)inbuf;
- 	z.avail_in = inbuf_len;
+	z.next_out = (Bytef *)outbuf;
+	z.avail_out = OUTBUFSIZ;
+	z.next_in = (Bytef *)inbuf;
+	z.avail_in = inbuf_len;
 
 #ifdef FRICC2_INPHP_COMPILE
- 	resultbuf = safe_emalloc(OUTBUFSIZ, sizeof(char), 0);
+	resultbuf = safe_emalloc(OUTBUFSIZ, sizeof(char), 0);
 #else
 	resultbuf = malloc(OUTBUFSIZ);
-#endif 	
- 	while (1) {
- 	 	if (mode == 0) {
- 	 		status = deflate(&z, Z_FINISH);
- 	 	} else {
- 	 		status = inflate(&z, Z_NO_FLUSH);
- 	 	}
- 	 	if (status == Z_STREAM_END) break;
- 	 	if (status != Z_OK) {
- 	 		if (mode == 0) {
- 	 			deflateEnd(&z);
- 	 		} else {
- 	 			inflateEnd(&z);
- 	 		}
- 	 		*resultbuf_len = 0;
- 	 		return(resultbuf);
- 	 	}
- 	 	if (z.avail_out == 0) {
+#endif
+	while (1) {
+		if (mode == 0) {
+			status = deflate(&z, Z_FINISH);
+		} else {
+			status = inflate(&z, Z_NO_FLUSH);
+		}
+		if (status == Z_STREAM_END) break;
+		if (status != Z_OK) {
+			if (mode == 0) {
+				deflateEnd(&z);
+			} else {
+				inflateEnd(&z);
+			}
+			*resultbuf_len = 0;
+			return(resultbuf);
+		}
+		if (z.avail_out == 0) {
 #ifdef FRICC2_INPHP_COMPILE
- 	 		resultbuf = safe_erealloc(resultbuf, total_count + OUTBUFSIZ+1, sizeof(char), 0); 	 		
+			resultbuf = safe_erealloc(resultbuf, total_count + OUTBUFSIZ+1, sizeof(char), 0);	
 #else
 			resultbuf = realloc(resultbuf, total_count + OUTBUFSIZ);	
 #endif
- 	 		memcpy(resultbuf + total_count, outbuf, OUTBUFSIZ);
- 	 		total_count += OUTBUFSIZ;
- 	 		z.next_out = (Bytef *)outbuf;
- 	 		z.avail_out = OUTBUFSIZ;
- 	 	}
- 	}
+			memcpy(resultbuf + total_count, outbuf, OUTBUFSIZ);
+			total_count += OUTBUFSIZ;
+			z.next_out = (Bytef *)outbuf;
+			z.avail_out = OUTBUFSIZ;
+		}
+	}
 
- 	if ((count = OUTBUFSIZ - z.avail_out) != 0) {
-#ifdef FRICC2_INPHP_COMPILE 	 	
- 	 	resultbuf = safe_erealloc(resultbuf, total_count + OUTBUFSIZ+1, sizeof(char), 0);
+	if ((count = OUTBUFSIZ - z.avail_out) != 0) {
+#ifdef FRICC2_INPHP_COMPILE
+		resultbuf = safe_erealloc(resultbuf, total_count + OUTBUFSIZ+1, sizeof(char), 0);
 #else
- 	 	resultbuf = realloc(resultbuf, total_count + OUTBUFSIZ);
+		resultbuf = realloc(resultbuf, total_count + OUTBUFSIZ);
 #endif
- 	 	memcpy(resultbuf + total_count, outbuf, count);
- 	 	total_count += count;
- 	}
- 	if (mode == 0) {
- 		deflateEnd(&z);
- 	} else {
- 		inflateEnd(&z);
- 	}
-	
- 	*resultbuf_len = total_count;
- 	return(resultbuf);
+		memcpy(resultbuf + total_count, outbuf, count);
+		total_count += count;
+	}
+	if (mode == 0) {
+		deflateEnd(&z);
+	} else {
+		inflateEnd(&z);
+	}
+
+	*resultbuf_len = total_count;
+	return(resultbuf);
 }
