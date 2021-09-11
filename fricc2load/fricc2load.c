@@ -1,9 +1,9 @@
 /*
-   +----------------------------------------------------------------------+
-   | FRICC2                                                               |
-   +----------------------------------------------------------------------+
-   | Author: sun bing <hoowa.sun@gmail.com>                               |
-   +----------------------------------------------------------------------+
+	+----------------------------------------------------------------------+
+	| FRICC2                                                               |
+	+----------------------------------------------------------------------+
+	| Author: sun bing <hoowa.sun@gmail.com>                               |
+	+----------------------------------------------------------------------+
 */
 
 #ifdef HAVE_CONFIG_H
@@ -38,7 +38,7 @@
 */
 int fricc2load_fd_checkheader(FILE *fp)
 {
-   	char ftag[FRICCTAG_LEN + 1];
+	char ftag[FRICCTAG_LEN + 1];
 
 	memset(ftag, 0, sizeof(ftag));
 	fread(ftag, sizeof(char), FRICCTAG_LEN, fp);
@@ -76,52 +76,63 @@ ZEND_API zend_op_array *fricc2load_compile_file(zend_file_handle *file_handle, i
 {
 	// file handle
 	FILE	*fp;
-   	char	fname[32];
-   	// real data
-   	char	*real_data_buf = NULL;
-   	size_t	real_data_len = 0;
-   	// stream fixup used
-   	char *tmp_buf = NULL;
-   	size_t tmp_size = 0;
+	char	fname[32];
+	// real data
+	char	*real_data_buf = NULL;
+	size_t	real_data_len = 0;
+	// stream fixup used
+	char *tmp_buf = NULL;
+	size_t tmp_size = 0;
+
+	// ignore phar
+	if (!file_handle || !file_handle->filename || strstr(file_handle->filename, ".phar") || strstr(file_handle->filename, "phar://"))
+		return org_compile_file(file_handle, type);
 
 	// checking file name
-   	memset(fname, 0, sizeof fname);
-   	if (zend_is_executing(TSRMLS_C) && get_active_function_name(TSRMLS_C))
+	memset(fname, 0, sizeof fname);
+	if (zend_is_executing(TSRMLS_C) && get_active_function_name(TSRMLS_C))
   		strncpy(fname, get_active_function_name(TSRMLS_C), sizeof fname - 2);
-   	if (fname[0]) {
-   		if ( strcasecmp(fname, "show_source") == 0
-   			|| strcasecmp(fname, "highlight_file") == 0) {
-   			return NULL;
-   		}
-   	}
+	if (fname[0]) {
+		if ( strcasecmp(fname, "show_source") == 0
+			|| strcasecmp(fname, "highlight_file") == 0) {
+			return NULL;
+		}
+	}
 
-   	// open file and decrypt and uncompress
+	// open file and decrypt and uncompress
 	// When file is opened directly (type is ZEND_HANDLE_FP), check here.
 	fp = fopen(file_handle->filename, "rb");
 	if (!fp)
 		return org_compile_file(file_handle, type);
 
-   	// check header tag to ignore decrypt and uncompress
-   	if (fricc2load_fd_checkheader(fp) != 0) {
-   		fclose(fp);
-   		return org_compile_file(file_handle, type);
-   	}
+	// check header tag to ignore decrypt and uncompress
+	if (fricc2load_fd_checkheader(fp) != 0) {
+		fclose(fp);
+#ifdef FRICCSANDBOX_ENABLE
+		goto DONEWORK;
+#else
+		return org_compile_file(file_handle, type);
+#endif
+	}
 
 	// decode real data
 	real_data_buf = fricc2load_fd_decrypt(fp, &real_data_len);
 	fclose(fp);
-	if (real_data_buf == NULL) {
-		//real_data_len = 0;
-		return org_compile_file(file_handle, type TSRMLS_CC);
-	} else if (real_data_len == 0) {
-		if (real_data_buf != NULL) {
+	// if buf = null or len = 0 means failed
+	if (real_data_buf == NULL || real_data_len == 0) {
+		if (real_data_buf != NULL)
 			efree(real_data_buf);
-			real_data_buf = NULL;
-		}
+		real_data_len = 0;
+		real_data_buf = NULL;
+#ifdef FRICCSANDBOX_ENABLE		
+		goto DONEWORK;
+#else		
 		return org_compile_file(file_handle, type TSRMLS_CC);
+#endif
 	}
 
 	// replace with new buf
+DONEWORK:	
   	if ( zend_stream_fixup(file_handle, &tmp_buf, &tmp_size TSRMLS_CC) == FAILURE )
   		return NULL;
 #if PHP_VERSION_ID < 70400

@@ -16,6 +16,7 @@ FRICC2 is a PHP Script encryption tool. When you are developing a commercial sof
 6. Tested on Ubuntu / CentOS / Openwrt.
 7. Tested in x86_64 / MIPS / ARM Processors.
 8. Supported PHP 8(include JIT), Tested Memory Leak.
+9. Supported Sandbox Mode(uncomment in fricc2_lib.h to enable it), only encrypted source can be run.
 
 
 
@@ -52,6 +53,9 @@ git clone https://github.com/hoowa/FRICC2.git
 # optional init key (Set Better Secure different)
 chmod +x ~/FRICC2/fricc2load/init_key
 ~/FRICC2/fricc2load/init_key
+
+# optional enable sandbox mode to edit fricc2_lib.h
+# uncomment FRICCSANDBOX_ENABLE
 
 # Requirement Example CentOS 7.9
 yum groupinstall "Development Tools"

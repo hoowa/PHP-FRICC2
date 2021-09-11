@@ -16,6 +16,7 @@ FRICC2是PHP源码加密工具。当你使用PHP开发商业软件时可以使�
 6. 在Ubuntu / CentOS / OpenWRT等数个操作系统下测试完毕。
 7. 在x86_64 / MIPS / ARM等数个不同架构CPU测试完毕。
 8. 首个支持PHP 8(及JIT模式)，并经过内存泄漏检测的开源加密算法。
+9. 支持沙箱模式(修改fricc2_lib.h头文件开启)，只支持加密后的.php文件。
 
 
 
@@ -52,6 +53,9 @@ git clone https://github.com/hoowa/FRICC2.git
 # 可选的初始化KEY (使用不同的KEY更难破解)
 chmod +x ~/FRICC2/fricc2load/init_key
 ~/FRICC2/fricc2load/init_key
+
+# 可选修改fricc2_lib.h取消FRICCSANDBOX_ENABLE的注释
+# 开启沙箱模式，支持加密后的PHP文件不再支持加密前PHP文件
 
 # 基本依赖安装示例 CentOS 7.9
 yum groupinstall "Development Tools"
