@@ -28,7 +28,8 @@ FRICC2 is a PHP Script encryption tool. When you are developing a commercial sof
 
 | PHP Version       | Status          | Notice                                               |
 | ----------------- | --------------- | ---------------------------------------------------- |
-| PHP 8.X           | Static / Shared | Recommend                                            |
+| PHP 8.1.X         | Static / Shared | Recommend, Tested on 8.1.10, FRICC2 2.0.1            |
+| PHP 8.0.X         | Static / Shared | Recommend, Tested on 8.0.23, FRICC2 2.0.1            |
 | PHP 7.4.X         | Static / Shared | Recommend                                            |
 | PHP 7.0.X / 7.3.X | Static / Shared | Runtime Little Memory Leak (auto free when php exit) |
 | Other Version     | NO TEST         | NO TEST                                              |
