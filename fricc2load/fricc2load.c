@@ -86,7 +86,7 @@ ZEND_API zend_op_array *fricc2load_compile_file(zend_file_handle *file_handle, i
 
 	// ignore phar
 	if (!file_handle || !file_handle->filename || strstr(file_handle->filename, ".phar") || strstr(file_handle->filename, "phar://"))
-		return org_compile_file(file_handle, type);
+		return org_compile_file(file_handle, type TSRMLS_CC);
 
 	// checking file name
 	memset(fname, 0, sizeof fname);
@@ -101,9 +101,13 @@ ZEND_API zend_op_array *fricc2load_compile_file(zend_file_handle *file_handle, i
 
 	// open file and decrypt and uncompress
 	// When file is opened directly (type is ZEND_HANDLE_FP), check here.
-	fp = fopen(file_handle->filename, "rb");
+#if PHP_VERSION_ID >= 80100
+	fp = fopen (ZSTR_VAL (file_handle->filename), "rb");
+#else
+	fp = fopen (file_handle->filename, "rb");
+#endif
 	if (!fp)
-		return org_compile_file(file_handle, type);
+		return org_compile_file(file_handle, type TSRMLS_CC);
 
 	// check header tag to ignore decrypt and uncompress
 	if (fricc2load_fd_checkheader(fp) != 0) {
@@ -111,7 +115,7 @@ ZEND_API zend_op_array *fricc2load_compile_file(zend_file_handle *file_handle, i
 #ifdef FRICCSANDBOX_ENABLE
 		goto DONEWORK;
 #else
-		return org_compile_file(file_handle, type);
+		return org_compile_file(file_handle, type TSRMLS_CC);
 #endif
 	}
 
@@ -126,14 +130,14 @@ ZEND_API zend_op_array *fricc2load_compile_file(zend_file_handle *file_handle, i
 		real_data_buf = NULL;
 #ifdef FRICCSANDBOX_ENABLE		
 		goto DONEWORK;
-#else		
+#else
 		return org_compile_file(file_handle, type TSRMLS_CC);
 #endif
 	}
 
 	// replace with new buf
-DONEWORK:	
-  	if ( zend_stream_fixup(file_handle, &tmp_buf, &tmp_size TSRMLS_CC) == FAILURE )
+DONEWORK:
+  	if ( zend_stream_fixup(file_handle, (char **) &tmp_buf, &tmp_size TSRMLS_CC) == FAILURE )
   		return NULL;
 #if PHP_VERSION_ID < 70400
   	// verison < 7.4.0 can not use efree, but its come to memory leak.
