@@ -65,7 +65,8 @@ int main(int argc, char**argv)
 	}
 	fwrite(FRICCTAG_STR, FRICCTAG_LEN, 1, fp);
 	fwrite(dst_data_buf, dst_data_len, 1, fp);
-	fclose(fp); fp = NULL;
+	fclose(fp);
+	fp = NULL;
 	fprintf(stderr, "Encrypted: %s\n", argv[2]);
 	goto CLEAN_DONE;
 
