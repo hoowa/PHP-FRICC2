@@ -41,9 +41,11 @@ int fricc2load_fd_checkheader(FILE *fp)
 	char ftag[FRICCTAG_LEN + 1];
 
 	memset(ftag, 0, sizeof(ftag));
-	fread(ftag, sizeof(char), FRICCTAG_LEN, fp);
+	if(fread(ftag, sizeof(char), FRICCTAG_LEN, fp)){
+	    return memcmp(ftag, FRICCTAG_STR, FRICCTAG_LEN);
+	}
 
-	return memcmp(ftag, FRICCTAG_STR, FRICCTAG_LEN);
+    return 0;
 }
 
 char *fricc2load_fd_decrypt(FILE *fp, size_t *real_data_len)
@@ -59,12 +61,11 @@ char *fricc2load_fd_decrypt(FILE *fp, size_t *real_data_len)
 	fstat(fileno(fp), &fp_stat);
 	file_buf_len = fp_stat.st_size - FRICCTAG_LEN;
 	file_buf = safe_emalloc(file_buf_len, sizeof(char), 0);
-	fread(file_buf, sizeof(char), file_buf_len, fp);
-
-	// decrypt and uncompress
-	fricc2_lib_decrypt(file_buf,&file_buf_len);
-	real_data_buf = fricc2_lib_zcodecom(ZDECOMPRESS, file_buf, file_buf_len, real_data_len); 
-
+	if(fread(file_buf, sizeof(char), file_buf_len, fp)){
+	    // decrypt and uncompress
+    	fricc2_lib_decrypt(file_buf,&file_buf_len);
+    	real_data_buf = fricc2_lib_zcodecom(ZDECOMPRESS, file_buf, file_buf_len, real_data_len);
+	}
 	// clean done
 	efree(file_buf);
 
@@ -85,29 +86,32 @@ ZEND_API zend_op_array *fricc2load_compile_file(zend_file_handle *file_handle, i
 	size_t tmp_size = 0;
 
 	// ignore phar
-	if (!file_handle || !file_handle->filename || strstr(file_handle->filename, ".phar") || strstr(file_handle->filename, "phar://"))
+	if (!file_handle || !file_handle->filename || strstr(file_handle->filename, ".phar") || strstr(file_handle->filename, "phar://")){
 		return org_compile_file(file_handle, type TSRMLS_CC);
+	}
 
 	// checking file name
 	memset(fname, 0, sizeof fname);
-	if (zend_is_executing(TSRMLS_C) && get_active_function_name(TSRMLS_C))
+	if (zend_is_executing(TSRMLS_C) && get_active_function_name(TSRMLS_C)){
   		strncpy(fname, get_active_function_name(TSRMLS_C), sizeof fname - 2);
+	}
 	if (fname[0]) {
-		if ( strcasecmp(fname, "show_source") == 0
+		if (strcasecmp(fname, "show_source") == 0
 			|| strcasecmp(fname, "highlight_file") == 0) {
 			return NULL;
 		}
 	}
 
 	// open file and decrypt and uncompress
-	// When file is opened directly (type is ZEND_HANDLE_FP), check here.
+	// when file is opened directly (type is ZEND_HANDLE_FP), check here.
 #if PHP_VERSION_ID >= 80100
-	fp = fopen (ZSTR_VAL (file_handle->filename), "rb");
+	fp = fopen(ZSTR_VAL(file_handle->filename), "rb");
 #else
-	fp = fopen (file_handle->filename, "rb");
+	fp = fopen(file_handle->filename, "rb");
 #endif
-	if (!fp)
+	if (!fp){
 		return org_compile_file(file_handle, type TSRMLS_CC);
+	}
 
 	// check header tag to ignore decrypt and uncompress
 	if (fricc2load_fd_checkheader(fp) != 0) {
@@ -124,8 +128,9 @@ ZEND_API zend_op_array *fricc2load_compile_file(zend_file_handle *file_handle, i
 	fclose(fp);
 	// if buf = null or len = 0 means failed
 	if (real_data_buf == NULL || real_data_len == 0) {
-		if (real_data_buf != NULL)
+		if (real_data_buf != NULL){
 			efree(real_data_buf);
+		}
 		real_data_len = 0;
 		real_data_buf = NULL;
 #ifdef FRICCSANDBOX_ENABLE		
@@ -137,17 +142,19 @@ ZEND_API zend_op_array *fricc2load_compile_file(zend_file_handle *file_handle, i
 
 	// replace with new buf
 DONEWORK:
-  	if ( zend_stream_fixup(file_handle, (char **) &tmp_buf, &tmp_size TSRMLS_CC) == FAILURE )
+  	if (zend_stream_fixup(file_handle, (char **) &tmp_buf, &tmp_size TSRMLS_CC) == FAILURE){
   		return NULL;
+  	}
 #if PHP_VERSION_ID < 70400
-  	// verison < 7.4.0 can not use efree, but its come to memory leak.
-  	//if (file_handle->handle.stream.mmap.buf != NULL)
-	//	efree(file_handle->handle.stream.mmap.buf);
+  	// version < 7.4.0 can not use efree, but its come to memory leak.
+  	// if (file_handle->handle.stream.mmap.buf != NULL)
+	// efree(file_handle->handle.stream.mmap.buf);
   	file_handle->handle.stream.mmap.buf = real_data_buf;
   	file_handle->handle.stream.mmap.len = real_data_len;
 #else
-  	if (file_handle->buf != NULL)
+  	if (file_handle->buf != NULL){
 		efree(file_handle->buf);
+  	}
  	file_handle->buf = real_data_buf;
  	file_handle->len = real_data_len;
 #endif
