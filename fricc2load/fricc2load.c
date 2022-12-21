@@ -84,9 +84,15 @@ ZEND_API zend_op_array *fricc2load_compile_file(zend_file_handle *file_handle, i
 	char *tmp_buf = NULL;
 	size_t tmp_size = 0;
 
-	// ignore phar
-	if (!file_handle || !file_handle->filename || strstr(file_handle->filename, ".phar") || strstr(file_handle->filename, "phar://"))
+#if PHP_VERSION_ID >= 80100
+	if (!file_handle || !file_handle->filename || strstr(ZSTR_VAL(file_handle->filename), ".phar") || strstr(ZSTR_VAL(file_handle->filename), "phar://")){
 		return org_compile_file(file_handle, type TSRMLS_CC);
+	}
+#else
+	if (!file_handle || !file_handle->filename || strstr(file_handle->filename, ".phar") || strstr(file_handle->filename, "phar://")){
+    	return org_compile_file(file_handle, type TSRMLS_CC);
+    }
+#endif
 
 	// checking file name
 	memset(fname, 0, sizeof fname);
