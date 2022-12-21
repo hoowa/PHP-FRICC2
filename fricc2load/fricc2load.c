@@ -61,7 +61,7 @@ char *fricc2load_fd_decrypt(FILE *fp, size_t *real_data_len)
 	fstat(fileno(fp), &fp_stat);
 	file_buf_len = fp_stat.st_size - FRICCTAG_LEN;
 	file_buf = safe_emalloc(file_buf_len, sizeof(char), 0);
-	if(fread(file_buf, sizeof(char), file_buf_len, fp)){
+	if (fread(file_buf, sizeof(char), file_buf_len, fp)) {
 		// decrypt and uncompress
 		fricc2_lib_decrypt(file_buf,&file_buf_len);
 		real_data_buf = fricc2_lib_zcodecom(ZDECOMPRESS, file_buf, file_buf_len, real_data_len);
