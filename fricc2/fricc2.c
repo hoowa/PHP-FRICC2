@@ -42,8 +42,10 @@ int main(int argc, char**argv)
   	fstat(fileno(fp), &fp_stat);
   	src_data_len = fp_stat.st_size;
   	src_data_buf = (char*)malloc(src_data_len + FRICCTAG_LEN);
-  	fread(src_data_buf, src_data_len, 1, fp);
-  	fclose(fp);	fp = NULL;
+  	if(fread(src_data_buf, src_data_len, 1, fp)){
+  	    fclose(fp);
+  	}
+  	fp = NULL;
 
   	//check source file
 	 if (memcmp(src_data_buf, FRICCTAG_STR, FRICCTAG_LEN) == 0) {
@@ -63,7 +65,8 @@ int main(int argc, char**argv)
 	}
 	fwrite(FRICCTAG_STR, FRICCTAG_LEN, 1, fp);
 	fwrite(dst_data_buf, dst_data_len, 1, fp);
-	fclose(fp); fp = NULL;
+	fclose(fp);
+	fp = NULL;
 	fprintf(stderr, "Encrypted: %s\n", argv[2]);
 	goto CLEAN_DONE;
 
