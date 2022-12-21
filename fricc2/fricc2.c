@@ -33,33 +33,33 @@ int main(int argc, char**argv)
 		goto CLEAN_DONE;
 	}
 
- 	// load source
- 	fp = fopen(argv[3], "r");
- 	if (fp == NULL) {
- 		fprintf(stderr, "File not found: %s\n", argv[3]);
- 		goto CLEAN_DONE;
- 	}
-  	fstat(fileno(fp), &fp_stat);
-  	src_data_len = fp_stat.st_size;
-  	src_data_buf = (char*)malloc(src_data_len + FRICCTAG_LEN);
-  	if(fread(src_data_buf, src_data_len, 1, fp)){
-  	    fclose(fp);
-  	}
-  	fp = NULL;
+	// load source
+	fp = fopen(argv[3], "r");
+	if (fp == NULL) {
+		fprintf(stderr, "File not found: %s\n", argv[3]);
+		goto CLEAN_DONE;
+	}
+	fstat(fileno(fp), &fp_stat);
+	src_data_len = fp_stat.st_size;
+	src_data_buf = (char*)malloc(src_data_len + FRICCTAG_LEN);
+	if (fread(src_data_buf, src_data_len, 1, fp)) {
+		fclose(fp);
+	}
+	fp = NULL;
 
-  	//check source file
+	//check source file
 	 if (memcmp(src_data_buf, FRICCTAG_STR, FRICCTAG_LEN) == 0) {
-  		fprintf(stderr, "Error Source was Encrypted: %s\n", argv[3]);
-  		goto CLEAN_DONE;
-  	}
+		fprintf(stderr, "Error Source was Encrypted: %s\n", argv[3]);
+		goto CLEAN_DONE;
+	}
 
 	// target compress and encode
 	dst_data_buf = fricc2_lib_zcodecom(ZENCOMPRESS, src_data_buf, src_data_len, &dst_data_len); 
 	fricc2_lib_decrypt(dst_data_buf,&dst_data_len);
 
- 	// save target
+	// save target
 	fp = fopen(argv[2], "w");
- 	if (fp == NULL) {
+	if (fp == NULL) {
 		fprintf(stderr, "Error Target File Create: %s\n", argv[2]);
 		goto CLEAN_DONE;
 	}
